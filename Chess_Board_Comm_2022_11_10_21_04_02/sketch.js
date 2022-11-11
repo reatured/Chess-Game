@@ -119,8 +119,18 @@ class Player {
 // result = 2: player2 win the capture
 // result = -1: Tie
 function check(player1Data, player2Data) {
-  player1Power = allPiecesDic[player1Data].power;
-  player2Power = allPiecesDic[player2Data].power;
+  if(allPiecesDic[player1Data] == undefined){
+    player1Power = 0;
+  }else{
+    player1Power = allPiecesDic[player1Data].power;
+  }
+
+  if(allPiecesDic[player2Data] == undefined){
+    player2Power = 0;
+  }else{
+    player2Power = allPiecesDic[player2Data].power;
+  }
+  
 
   console.log("Player 1 Power: " + player1Power)
   console.log("Player 2 Power: " + player2Power)
