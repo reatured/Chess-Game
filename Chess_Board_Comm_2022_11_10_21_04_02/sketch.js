@@ -29,7 +29,7 @@ let _pieceCountDic = {
 
 //What you need for arduino:!!!! @ potato
 let player1Power, player2Power; //power tobe displayed;
-let powerComparingResult; 
+let powerComparingResult;
 
 
 function setup() {
@@ -47,7 +47,9 @@ function draw() {
   background(0);
   fill(255);
   // display the incoming serial data as a string:
-  text("sensor value: " + player1Data, 30, 50);
+  text("sensor value: " + player1Data + " " + allPiecesDic[player1Data].type, 30, 50);
+  text("sensor value: " + player2Data + " " + allPiecesDic[player2Data].type, 30, 90);
+  text("Comparison: " + powerComparingResult, 30, 130);
 }
 
 // ========================Game Part==============================//
@@ -56,6 +58,7 @@ function initiateGamePart() {
   resetGame();
 }
 
+//No need to change
 class Piece {
   constructor(type, i, player) {
     this.type = type;
@@ -79,6 +82,8 @@ class Player {
     for (var type in _pieceCountDic) {
       for (let i = 0; i < _pieceCountDic[type]; i++) {
         let currentPiece = new Piece(type, i, this.playerID)
+
+        //change rules for power distribution here::::
         switch (type) {
           case "King":
             currentPiece.power = 1;
@@ -102,27 +107,30 @@ class Player {
   }
 }
 
-function randomInt(min, max) {
-  return int(random(min, max))
-}
 
 
+//return the result of comparison:
+// result = 1: player1 win the capture
+// result = 2: player2 win the capture
+// result = -1: Tie
 function check(player1Data, player2Data) {
   player1Power = allPiecesDic[player1Data].power;
   player2Power = allPiecesDic[player2Data].power;
-
 
   console.log("Player 1 Power: " + player1Power)
   console.log("Player 2 Power: " + player2Power)
   let result = player1Power > player2Power ? 1 : 2
 
-  if(player1Power == player2Power){
+  if (player1Power == player2Power) {
     result = -1
   }
-  return result 
+  return result
 }
 
 
+//For
+// 1. reset game
+// 2. comparing power after pieces were put in places
 function keyPressed() {
   if (keyCode == 82) { //===press r to reset the game
     console.log("resetting game");
@@ -134,11 +142,14 @@ function keyPressed() {
   }
 }
 
+//helper functions below;;
 function resetGame() {
   player1 = new Player(1);
   player2 = new Player(2);
-
   console.log(allPiecesDic)
+}
+function randomInt(min, max) {
+  return int(random(min, max))
 }
 
 
