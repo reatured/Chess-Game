@@ -1,18 +1,45 @@
 let serial;
 let portName = '/dev/tty.usbmodem2101';
-let player1Data, player2Data;
-let player1, player2;
-let nameList = [ "Q", "K", "KN", "KN1", "P1", "P2", "P3", "P4"]
 
+let player1, player2;
+let _pieceShortDic = {
+  "King": "K",
+  "Queen": "Q",
+  "Knight": "KN",
+  "Pawn": "P",
+  "Rook": "R",
+  "Bishop": "B"
+};
+let allPiecesDic = {};
+//not important above^^^
+
+//Arduino input to here: !!! @ potato
+let player1Data, player2Data;
+
+//Manipulatable variable:!!!! @ potato
+//Number of each pieces:
+let _pieceCountDic = {
+  "King": 1,
+  "Queen": 1,
+  "Knight": 2,
+  "Pawn": 4,
+  "Rook": 0,
+  "Bishop": 0
+};
+
+//What you need for arduino:!!!! @ potato
 let player1Power, player2Power; //power tobe displayed;
+let powerComparingResult; 
+
+
 function setup() {
   createCanvas(400, 300);
 
   initiatePhysicalPart();
   initiateGamePart();
 
-  player1Data = "K";
-  player2Data = "Q";
+  player1Data = "1Q0";
+  player2Data = "2P1";
 }
 
 function draw() {
@@ -30,58 +57,88 @@ function initiateGamePart() {
 }
 
 class Piece {
-  constructor(name) {
-    this.name = name;
-    this.power;
+  constructor(type, i, player) {
+    this.type = type;
+
+    this.power = 0;
+    this.playerID = player;
+
+    this.name = player + _pieceShortDic[type] + i;
+    allPiecesDic[this.name] = this;
   }
 }
 
 class Player {
-  constructor() {
-    this.pieces = {};
+  constructor(id) {
+    this.pieces = [];
+    this.playerID = id;
     this.populatePieces();
   }
 
   populatePieces() {
-    for(let i =0; i< nameList.length; i++){
-        let currentPiece = new Piece(nameList[i])
-        if(currentPiece.name == "Pawn")
-        currentPiece.power = randomInt(2)
+    for (var type in _pieceCountDic) {
+      for (let i = 0; i < _pieceCountDic[type]; i++) {
+        let currentPiece = new Piece(type, i, this.playerID)
+        switch (type) {
+          case "King":
+            currentPiece.power = 1;
+            break;
+          case "Queen":
+            currentPiece.power = 4;
+            break;
+          case "Knight":
+            currentPiece.power = randomInt(2, 5);
+            break;
+          case "Pawn":
+            currentPiece.power = randomInt(1, 3);
+            break;
 
-
-        this.pieces[nameList[i]] = currentPiece
+          default:
+            break;
+        }
+        this.pieces.push(currentPiece)
+      }
     }
   }
 }
 
-function randomInt(amount) {
-  return int(random(amount))
+function randomInt(min, max) {
+  return int(random(min, max))
 }
 
 
 function check(player1Data, player2Data) {
-  player1Power = player1.pieces[player1Data];
-  player2Power = player2.pieces[player2Data];
+  player1Power = allPiecesDic[player1Data].power;
+  player2Power = allPiecesDic[player2Data].power;
 
-  return player1Power > player2Power ? 1 : 2
+
+  console.log("Player 1 Power: " + player1Power)
+  console.log("Player 2 Power: " + player2Power)
+  let result = player1Power > player2Power ? 1 : 2
+
+  if(player1Power == player2Power){
+    result = -1
+  }
+  return result 
 }
 
 
 function keyPressed() {
   if (keyCode == 82) { //===press r to reset the game
-    print("resetting game");
+    console.log("resetting game");
     resetGame();
   } else if (keyCode == 13) { //===press enter to compare power
-    print("checking power");
-    result = check(player1Data, player2Data)
-    print(result)
+    console.log("checking power");
+    powerComparingResult = check(player1Data, player2Data)
+    console.log(powerComparingResult)
   }
 }
 
 function resetGame() {
-  player1 = new Player();
-  player2 = new Player();
-  print(player1.pieces)
+  player1 = new Player(1);
+  player2 = new Player(2);
+
+  console.log(allPiecesDic)
 }
 
 
