@@ -29,7 +29,7 @@ let _pieceCountDic = {
 };
 
 //What you need for arduino:!!!! @ potato
-let player1Power, player2Power; //power tobe displayed;
+let player1Power = 0, player2Power = 0; //power tobe displayed;
 let powerComparingResult;
 
 
@@ -205,9 +205,13 @@ function serialEvent(index) {
   if (!currentString) return;
   // console.log(currentString);
   data[index] = currentString;
-  console.log(data);
+  // console.log(data);
   
-  serials[index].write(player1Power);
+  console.log("p1p " + player1Power);
+  console.log("p2p " + player2Power);
+
+  serials[0].write(player1Power);
+  serials[1].write(player2Power);
   assignData();
 }
 
@@ -221,7 +225,7 @@ function assignData(){
   if(data[1] != undefined){
   player2Data = data[1];
   }
-  console.log(player1Data, player2Data);
+  // console.log(player1Data, player2Data);
 }
 
 function serialError(err) {
