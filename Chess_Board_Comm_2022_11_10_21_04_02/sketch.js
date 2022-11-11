@@ -1,5 +1,5 @@
-let serial;
-let portName = '/dev/tty.usbmodem2101';
+let serials = [];
+let portNames = ['/dev/tty.usbmodem101','/dev/tty.usbmodem2101'];
 
 let player1, player2;
 let _pieceShortDic = {
@@ -10,10 +10,11 @@ let _pieceShortDic = {
   "Rook": "R",
   "Bishop": "B"
 };
-let allPiecesDic = {};
+let allPiecesDic = [];
 //not important above^^^
 
 //Arduino input to here: !!! @ potato
+let data = [];
 let player1Data, player2Data;
 
 //Manipulatable variable:!!!! @ potato
@@ -38,8 +39,8 @@ function setup() {
   initiatePhysicalPart();
   initiateGamePart();
 
-  player1Data = "1Q0";
-  player2Data = "2P1";
+  player1Data =  undefined;
+  player2Data = undefined;
 }
 
 function draw() {
@@ -47,8 +48,12 @@ function draw() {
   background(0);
   fill(255);
   // display the incoming serial data as a string:
-  text("sensor value: " + player1Data + " " + allPiecesDic[player1Data].type, 30, 50);
-  text("sensor value: " + player2Data + " " + allPiecesDic[player2Data].type, 30, 90);
+  if(player1Data != undefined){
+     text("sensor value: " + player1Data + " " + allPiecesDic[player1Data].type, 30, 50); 
+  }
+  if(player2Data != undefined){
+      text("sensor value: " + player2Data + " " + allPiecesDic[player2Data].type, 30, 90);
+  }
   text("Comparison: " + powerComparingResult, 30, 130);
 }
 
@@ -160,13 +165,17 @@ function randomInt(min, max) {
 
 function initiatePhysicalPart() {
   try {
-    serial = new p5.SerialPort();
-    serial.on('connected', serverConnected);
-    serial.on('open', portOpen);
-    serial.on('data', serialEvent);
-    serial.on('error', serialError);
-    serial.on('close', portClose);
-    serial.open(portName);
+    for(let i = 0; i < portNames.length; i++){
+      let newPort = new p5.SerialPort();
+      newPort.open(portNames[i]);
+      newPort.on('connected', serverConnected);
+      newPort.on('open', portOpen);
+      newPort.on('data', serialEvent.bind(this, i));
+      newPort.on('error', serialError);
+      newPort.on('gotClose', portClose);
+     
+      serials.push(newPort);
+    }
   } catch (error) {
 
   }
@@ -180,14 +189,29 @@ function portOpen() {
   console.log('the serial port opened.')
 }
 
-function serialEvent() {
-  let currentString = serial.readLine();
+function serialEvent(index) {
+  let currentString = serials[index].readLine();
   trim(currentString);
   if (!currentString) return;
-  console.log(currentString);
-  player1Data = currentString;
+  // console.log(currentString);
+  data[index] = currentString;
+  console.log(data);
+  
+  serials[index].write(player1Power);
+  assignData();
+}
 
+function sendData(){
+}
 
+function assignData(){
+  if (data[0]  != undefined){
+  player1Data = data[0];
+  }
+  if(data[1] != undefined){
+  player2Data = data[1];
+  }
+  console.log(player1Data, player2Data);
 }
 
 function serialError(err) {
