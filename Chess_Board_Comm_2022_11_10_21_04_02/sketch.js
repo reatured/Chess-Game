@@ -150,10 +150,16 @@ function keyPressed() {
   if (keyCode == 82) { //===press r to reset the game
     console.log("resetting game");
     resetGame();
+    serials[0].write(int(6) + '\n');
+    serials[1].write(int(6) + '\n');
   } else if (keyCode == 13) { //===press enter to compare power
     console.log("checking power");
-    powerComparingResult = check(player1Data, player2Data)
-    console.log(powerComparingResult)
+    powerComparingResult = check(player1Data, player2Data);
+    console.log(powerComparingResult);
+    // if(player1Power != 0 || player2Power != 0){
+      serials[0].write(player1Power + '\n');
+      serials[1].write(player1Power + '\n');
+    // }
   }
 }
 
@@ -207,11 +213,11 @@ function serialEvent(index) {
   data[index] = currentString;
   // console.log(data);
   
-  console.log("p1p " + player1Power);
-  console.log("p2p " + player2Power);
+  // console.log("p1p " + player1Power);
+  // console.log("p2p " + player2Power);
 
-  serials[0].write(player1Power);
-  serials[1].write(player2Power);
+  serials[0].write(int(player1Power));
+  serials[1].write(int(player2Power));
   assignData();
 }
 
