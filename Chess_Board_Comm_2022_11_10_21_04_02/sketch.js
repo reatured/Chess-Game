@@ -123,6 +123,7 @@ function check(player1Data, player2Data) {
     player1Power = 0;
   }else{
     player1Power = allPiecesDic[player1Data].power;
+    allPiecesDic[player1Data].power++; 
   }
 
   if(allPiecesDic[player2Data] == undefined){
